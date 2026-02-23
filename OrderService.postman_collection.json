@@ -1,0 +1,287 @@
+{
+  "info": {
+    "name": "TECSUP Modulo 4 - Microservices Collection",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Coleccion para User, Product y Order Service. Endpoints protegidos usan Basic Auth. Variables por defecto apuntan a NodePort local."
+  },
+  "variable": [
+    { "key": "baseUrlUser", "value": "http://localhost:30081" },
+    { "key": "baseUrlProduct", "value": "http://localhost:30082" },
+    { "key": "baseUrlOrder", "value": "http://localhost:30083" },
+    { "key": "adminUsername", "value": "juan.perez@example.com" },
+    { "key": "adminPassword", "value": "admin123" },
+    { "key": "userUsername", "value": "maria.garcia@example.com" },
+    { "key": "userPassword", "value": "user123" },
+    { "key": "sampleUserId", "value": "1" },
+    { "key": "sampleProductId1", "value": "1" },
+    { "key": "sampleProductId2", "value": "3" },
+    { "key": "sampleOrderId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "00 - Health",
+      "item": [
+        {
+          "name": "User Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrlUser}}/api/users/health"
+          }
+        },
+        {
+          "name": "Product Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrlProduct}}/api/products/health"
+          }
+        },
+        {
+          "name": "Order Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrlOrder}}/api/orders/health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "01 - User Service",
+      "item": [
+        {
+          "name": "Get Current User (Basic Auth)",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{userUsername}}", "type": "string" },
+                { "key": "password", "value": "{{userPassword}}", "type": "string" }
+              ]
+            },
+            "url": "{{baseUrlUser}}/api/users/me"
+          }
+        },
+        {
+          "name": "Get All Users (ADMIN)",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{adminUsername}}", "type": "string" },
+                { "key": "password", "value": "{{adminPassword}}", "type": "string" }
+              ]
+            },
+            "url": "{{baseUrlUser}}/api/users"
+          }
+        },
+        {
+          "name": "Get User By ID (ADMIN)",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{adminUsername}}", "type": "string" },
+                { "key": "password", "value": "{{adminPassword}}", "type": "string" }
+              ]
+            },
+            "url": "{{baseUrlUser}}/api/users/{{sampleUserId}}"
+          }
+        },
+        {
+          "name": "Create User (ADMIN)",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{adminUsername}}", "type": "string" },
+                { "key": "password", "value": "{{adminPassword}}", "type": "string" }
+              ]
+            },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nuevo Usuario\",\n  \"email\": \"nuevo.usuario@example.com\",\n  \"phone\": \"+51-900-000-000\",\n  \"address\": \"Av. Principal 123\"\n}"
+            },
+            "url": "{{baseUrlUser}}/api/users"
+          }
+        },
+        {
+          "name": "Update User (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{adminUsername}}", "type": "string" },
+                { "key": "password", "value": "{{adminPassword}}", "type": "string" }
+              ]
+            },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Usuario Actualizado\",\n  \"email\": \"juan.perez@example.com\",\n  \"phone\": \"+51-999-123-456\",\n  \"address\": \"Av. Arequipa 1234, Lima\"\n}"
+            },
+            "url": "{{baseUrlUser}}/api/users/{{sampleUserId}}"
+          }
+        },
+        {
+          "name": "Delete User (ADMIN)",
+          "request": {
+            "method": "DELETE",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{adminUsername}}", "type": "string" },
+                { "key": "password", "value": "{{adminPassword}}", "type": "string" }
+              ]
+            },
+            "url": "{{baseUrlUser}}/api/users/{{sampleUserId}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "02 - Product Service",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrlProduct}}/api/products"
+          }
+        },
+        {
+          "name": "Get Available Products",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrlProduct}}/api/products/available"
+          }
+        },
+        {
+          "name": "Get Product By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrlProduct}}/api/products/{{sampleProductId1}}"
+          }
+        },
+        {
+          "name": "Get Products By User (Auth)",
+          "request": {
+            "method": "GET",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{userUsername}}", "type": "string" },
+                { "key": "password", "value": "{{userPassword}}", "type": "string" }
+              ]
+            },
+            "url": "{{baseUrlProduct}}/api/products/user/{{sampleUserId}}"
+          }
+        },
+        {
+          "name": "Create Product (ADMIN)",
+          "request": {
+            "method": "POST",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{adminUsername}}", "type": "string" },
+                { "key": "password", "value": "{{adminPassword}}", "type": "string" }
+              ]
+            },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Teclado Mecanico\",\n  \"description\": \"Teclado mecanico RGB\",\n  \"price\": 249.99,\n  \"stock\": 10,\n  \"category\": \"Perifericos\",\n  \"createdBy\": {{sampleUserId}}\n}"
+            },
+            "url": "{{baseUrlProduct}}/api/products"
+          }
+        },
+        {
+          "name": "Update Product (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{adminUsername}}", "type": "string" },
+                { "key": "password", "value": "{{adminPassword}}", "type": "string" }
+              ]
+            },
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Producto Actualizado\",\n  \"description\": \"Descripcion actualizada\",\n  \"price\": 199.99,\n  \"stock\": 5,\n  \"category\": \"Perifericos\"\n}"
+            },
+            "url": "{{baseUrlProduct}}/api/products/{{sampleProductId1}}"
+          }
+        },
+        {
+          "name": "Delete Product (ADMIN)",
+          "request": {
+            "method": "DELETE",
+            "auth": {
+              "type": "basic",
+              "basic": [
+                { "key": "username", "value": "{{adminUsername}}", "type": "string" },
+                { "key": "password", "value": "{{adminPassword}}", "type": "string" }
+              ]
+            },
+            "url": "{{baseUrlProduct}}/api/products/{{sampleProductId1}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "03 - Order Service",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{sampleUserId}},\n  \"items\": [\n    {\n      \"productId\": {{sampleProductId1}},\n      \"quantity\": 2\n    },\n    {\n      \"productId\": {{sampleProductId2}},\n      \"quantity\": 1\n    }\n  ]\n}"
+            },
+            "url": "{{baseUrlOrder}}/api/orders"
+          }
+        },
+        {
+          "name": "Get All Orders",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrlOrder}}/api/orders"
+          }
+        },
+        {
+          "name": "Get Order By ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrlOrder}}/api/orders/{{sampleOrderId}}"
+          }
+        },
+        {
+          "name": "Get Orders By User ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrlOrder}}/api/orders/user/{{sampleUserId}}"
+          }
+        }
+      ]
+    }
+  ]
+}
