@@ -673,3 +673,6 @@ kubectl rollout restart deployment/order-service -n order-service
 volver a entrar
 docker-compose up -d
 kubectl get pods -A
+
+kubectl logs -n order-service -l app=order-service --tail=200
+kubectl describe pod -n order-service -l app=order-service

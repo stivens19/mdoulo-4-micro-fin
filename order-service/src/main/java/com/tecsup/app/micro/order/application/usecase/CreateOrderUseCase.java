@@ -33,12 +33,15 @@ public class CreateOrderUseCase {
     // Contador para generar números de orden únicos
     private static final AtomicInteger orderSequence = new AtomicInteger(1);
     
+    /**
+     * Crea una nueva orden, validando items y calculando el total.
+     */
     public Order execute(Order order) {
-        log.debug("Executing CreateOrderUseCase for user: {}", order.getUserId());
+        log.debug("Ejecutando CreateOrderUseCase para el usuario con ID: {}", order.getUserId());
         
         // Validar datos de la orden
         if (!order.isValid()) {
-            throw new InvalidOrderException("Invalid order data. User ID and items are required.");
+            throw new InvalidOrderException("Orden invalida. El ID de usuario y los campos son requeridos.");
         }
         
         // Validar y obtener productos del Product Service
@@ -66,11 +69,14 @@ public class CreateOrderUseCase {
 
         // Reasociar info de productos para la respuesta
         attachProductsToSavedItems(savedOrder, validatedItems);
-        log.info("Order created successfully with id: {} and orderNumber: {}", savedOrder.getId(), savedOrder.getOrderNumber());
+        log.info("Orden creada correctamente con id: {} y número de orden: {}", savedOrder.getId(), savedOrder.getOrderNumber());
         
         return savedOrder;
     }
 
+    /**
+     * Reasocia la informacion de productos a los items ya persistidos.
+     */
     private void attachProductsToSavedItems(Order savedOrder, List<OrderItem> validatedItems) {
         if (savedOrder == null || savedOrder.getItems() == null || validatedItems == null) {
             return;
@@ -93,7 +99,7 @@ public class CreateOrderUseCase {
     }
     
     /**
-     * Valida cada item consultando el Product Service y obtiene el precio actual
+     * Valida cada item consultando el Product Service y obtiene el precio actual.
      */
     private List<OrderItem> validateAndEnrichItems(List<OrderItem> items) {
         return items.stream()
@@ -122,23 +128,23 @@ public class CreateOrderUseCase {
                                 .product(product)
                                 .build();
                         
-                        log.debug("Item validated: productId={}, quantity={}, unitPrice={}, subtotal={}", 
+                        log.debug("Item validado: productId={}, quantity={}, unitPrice={}, subtotal={}", 
                                 item.getProductId(), item.getQuantity(), unitPrice, subtotal);
                         
                         return enrichedItem;
                     } catch (ProductNotFoundException e) {
-                        log.error("Product not found: {}", item.getProductId());
+                        log.error("Producto no encontrado: {}", item.getProductId());
                         throw e;
                     } catch (Exception e) {
-                        log.error("Error validating product {}: {}", item.getProductId(), e.getMessage());
-                        throw new InvalidOrderException("Error validating product " + item.getProductId() + ": " + e.getMessage());
+                        log.error("Error al validar el producto {}: {}", item.getProductId(), e.getMessage());
+                        throw new InvalidOrderException("Error al validar el producto " + item.getProductId() + ": " + e.getMessage());
                     }
                 })
                 .toList();
     }
     
     /**
-     * Calcula el total de la orden sumando todos los subtotales
+     * Calcula el total de la orden sumando todos los subtotales.
      */
     private BigDecimal calculateTotal(List<OrderItem> items) {
         return items.stream()
