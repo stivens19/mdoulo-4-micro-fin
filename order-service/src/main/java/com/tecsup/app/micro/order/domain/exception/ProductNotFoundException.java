@@ -6,6 +6,6 @@ package com.tecsup.app.micro.order.domain.exception;
 public class ProductNotFoundException extends RuntimeException {
     
     public ProductNotFoundException(Long productId) {
-        super("Product with id " + productId + " not found in Product Service");
+        super("Producto con id " + productId + " no encontrado");
     }
 }

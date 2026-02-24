@@ -4,10 +4,9 @@ import com.tecsup.app.micro.order.domain.exception.InvalidOrderException;
 import com.tecsup.app.micro.order.domain.exception.ProductNotFoundException;
 import com.tecsup.app.micro.order.domain.model.Order;
 import com.tecsup.app.micro.order.domain.model.OrderItem;
-import com.tecsup.app.micro.order.domain.model.OrderStatus;
-import com.tecsup.app.micro.order.domain.model.Product;
 import com.tecsup.app.micro.order.domain.repository.OrderRepository;
 import com.tecsup.app.micro.order.infrastructure.client.ProductClient;
+import com.tecsup.app.micro.order.infrastructure.client.dto.ProductDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -15,9 +14,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Caso de uso: Crear una nueva orden
@@ -29,9 +26,6 @@ public class CreateOrderUseCase {
     
     private final OrderRepository orderRepository;
     private final ProductClient productClient;
-    
-    // Contador para generar números de orden únicos
-    private static final AtomicInteger orderSequence = new AtomicInteger(1);
     
     /**
      * Crea una nueva orden, validando items y calculando el total.
@@ -50,14 +44,14 @@ public class CreateOrderUseCase {
         // Calcular subtotales y total
         BigDecimal totalAmount = calculateTotal(validatedItems);
         
-        // Generar número de orden único
-        String orderNumber = Order.generateOrderNumber(orderSequence.getAndIncrement());
+        // Generar número de orden único usando timestamp
+        String orderNumber = Order.generateOrderNumber();
         
         // Crear orden completa
         Order newOrder = Order.builder()
                 .orderNumber(orderNumber)
                 .userId(order.getUserId())
-                .status(OrderStatus.PENDING)
+                .status("PENDING")
                 .totalAmount(totalAmount)
                 .items(validatedItems)
                 .createdAt(LocalDateTime.now())
@@ -66,37 +60,12 @@ public class CreateOrderUseCase {
         
         // Guardar orden
         Order savedOrder = orderRepository.save(newOrder);
-
-        // Reasociar info de productos para la respuesta
-        attachProductsToSavedItems(savedOrder, validatedItems);
         log.info("Orden creada correctamente con id: {} y número de orden: {}", savedOrder.getId(), savedOrder.getOrderNumber());
         
         return savedOrder;
     }
 
-    /**
-     * Reasocia la informacion de productos a los items ya persistidos.
-     */
-    private void attachProductsToSavedItems(Order savedOrder, List<OrderItem> validatedItems) {
-        if (savedOrder == null || savedOrder.getItems() == null || validatedItems == null) {
-            return;
-        }
 
-        Map<Long, Product> productById = validatedItems.stream()
-                .filter(item -> item.getProduct() != null)
-                .collect(Collectors.toMap(
-                        OrderItem::getProductId,
-                        OrderItem::getProduct,
-                        (existing, replacement) -> existing
-                ));
-
-        savedOrder.getItems().forEach(item -> {
-            Product product = productById.get(item.getProductId());
-            if (product != null) {
-                item.setProduct(product);
-            }
-        });
-    }
     
     /**
      * Valida cada item consultando el Product Service y obtiene el precio actual.
@@ -106,15 +75,15 @@ public class CreateOrderUseCase {
                 .map(item -> {
                     try {
                         // Obtener producto del Product Service
-                        Product product = productClient.getProductById(item.getProductId());
+                        ProductDto productDto = productClient.getProductById(item.getProductId());
                         
                         // Validar que el producto existe
-                        if (product == null) {
+                        if (productDto == null) {
                             throw new ProductNotFoundException(item.getProductId());
                         }
                         
                         // Usar el precio actual del producto
-                        BigDecimal unitPrice = product.getPrice();
+                        BigDecimal unitPrice = productDto.getPrice();
                         
                         // Calcular subtotal
                         BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(item.getQuantity()));
@@ -125,7 +94,6 @@ public class CreateOrderUseCase {
                                 .quantity(item.getQuantity())
                                 .unitPrice(unitPrice)
                                 .subtotal(subtotal)
-                                .product(product)
                                 .build();
                         
                         log.debug("Item validado: productId={}, quantity={}, unitPrice={}, subtotal={}", 

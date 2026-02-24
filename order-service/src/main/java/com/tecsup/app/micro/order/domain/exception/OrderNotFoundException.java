@@ -6,10 +6,10 @@ package com.tecsup.app.micro.order.domain.exception;
 public class OrderNotFoundException extends RuntimeException {
     
     public OrderNotFoundException(Long orderId) {
-        super("Order with id " + orderId + " not found");
+        super("Orden con ID " + orderId + " no encontrada");
     }
     
     public OrderNotFoundException(String orderNumber) {
-        super("Order with number " + orderNumber + " not found");
+        super("Orden con número " + orderNumber + " no encontrada");
     }
 }

@@ -23,7 +23,7 @@ public class Order {
     private Long id;
     private String orderNumber;
     private Long userId;
-    private OrderStatus status;
+    private String status;
     private BigDecimal totalAmount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -53,10 +53,13 @@ public class Order {
     }
     
     /**
-     * Genera un número de orden único basado en el año y un contador
+     * Genera un número de orden único basado en timestamp
      */
-    public static String generateOrderNumber(int sequence) {
+    public static String generateOrderNumber() {
         int year = LocalDateTime.now().getYear();
-        return String.format("ORD-%d-%03d", year, sequence);
+        long timestamp = System.currentTimeMillis();
+        // Usar los últimos 6 dígitos del timestamp para asegurar unicidad
+        long uniqueNumber = timestamp % 1000000;
+        return String.format("ORD-%d-%06d", year, uniqueNumber);
     }
 }

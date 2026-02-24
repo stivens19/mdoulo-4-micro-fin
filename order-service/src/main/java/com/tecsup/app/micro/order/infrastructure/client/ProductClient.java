@@ -1,9 +1,7 @@
 package com.tecsup.app.micro.order.infrastructure.client;
 
 import com.tecsup.app.micro.order.domain.exception.ProductNotFoundException;
-import com.tecsup.app.micro.order.domain.model.Product;
 import com.tecsup.app.micro.order.infrastructure.client.dto.ProductDto;
-import com.tecsup.app.micro.order.infrastructure.client.mapper.ProductDtoMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +17,6 @@ import org.springframework.web.client.RestTemplate;
 public class ProductClient {
 
     private final RestTemplate restTemplate;
-    private final ProductDtoMapper productDtoMapper;
 
     @Value("${product.service.url}")
     private String productServiceUrl;
@@ -27,7 +24,7 @@ public class ProductClient {
     /**
      * Obtiene un producto por ID desde el Product Service
      */
-    public Product getProductById(Long productId) {
+    public ProductDto getProductById(Long productId) {
         log.info("Calling Product Service to get product with id: {}", productId);
 
         String url = this.productServiceUrl + "/api/products/" + productId;
@@ -41,7 +38,7 @@ public class ProductClient {
             }
             
             log.info("Product retrieved successfully from Product Service: {}", productDto);
-            return productDtoMapper.toDomain(productDto);
+            return productDto;
         } catch (ProductNotFoundException e) {
             throw e;
         } catch (Exception e) {

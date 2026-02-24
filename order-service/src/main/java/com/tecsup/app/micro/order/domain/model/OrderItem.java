@@ -24,9 +24,6 @@ public class OrderItem {
     private BigDecimal unitPrice;
     private BigDecimal subtotal;
     
-    // Referencia al producto (obtenido del Product Service)
-    private Product product;
-    
     /**
      * Calcula el subtotal (quantity × unitPrice)
      */
